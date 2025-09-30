@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>사진 업로드</title>
   <style>
-    :root { --banner-h: 72px; } /* 더 넉넉한 기본값 (ko 환경 권장) */
+    /* :root { --banner-h: 72px; } /* 더 넉넉한 기본값 (ko 환경 권장) */ */
 
     html, body { height:100%; margin:0; background:#fafafa; }
     /* 전체를 iframe으로 덮는 고정 레이아웃 (vh 사용 안 함) */
     iframe#uploader {
       position: fixed;
-      top: calc(-1 * var(--banner-h)); /* 배너만큼 위로 올림 */
+      /* top: calc(-1 * var(--banner-h)); /* 배너만큼 위로 올림 */ */
       left: 0; right: 0; bottom: 0;
       width: 100%;
-      height: auto; /* bottom:0로 자동 계산 */
+     height:100%;
       border: 0;
       background: #fafafa;
     }
@@ -42,8 +42,8 @@
     const q = new URLSearchParams(location.search);
     const bh = q.get('bh');
     const showBanner = q.get('showBanner') === '1';
-    if (bh) document.documentElement.style.setProperty('--banner-h', parseInt(bh,10)+'px');
-    if (showBanner) document.documentElement.style.setProperty('--banner-h', '0px');
+    // if (bh) document.documentElement.style.setProperty('--banner-h', parseInt(bh,10)+'px');
+    // if (showBanner) document.documentElement.style.setProperty('--banner-h', '0px');
 
     // 업로더 URL 구성(redirect 전달)
     const url = new URL(EXEC_URL);
