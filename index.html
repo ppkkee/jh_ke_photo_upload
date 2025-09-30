@@ -1,1 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>사진 업로드</title>
+  <style>
+    html, body { height:100%; margin:0; background:#0000; }
+    .frame-wrap { position:fixed; inset:0; overflow:hidden; background:#fafafa; }
+    iframe {
+      position:absolute; inset:0;
+      width:100%; height:calc(100% + 56px);
+      border:0;
+      transform: translateY(-56px); /* 상단 GAS 배너 시각적 숨김 */
+    }
+  </style>
+</head>
+<body>
+  <div class="frame-wrap">
+    <iframe id="uploader" allow="camera *; clipboard-write *"></iframe>
+  </div>
+  <script>
+    // === 여기를 네 값으로 바꾸세요 ===
+    const EXEC_URL = "https://script.google.com/macros/s/AKfycbx-e4VS-5QQCFR4swXi7nvOjKPxVV5mZIzf7JE6ZsnZsmstN2IGH_RwDD7cW3CeVytj/exec"; // Apps Script /exec URL
+    const REDIRECT_URL = "https://toourguest.com/cards/jh-ke#guest-snap"; // 업로드 완료 후 돌아갈 주소(앵커 포함)
+    // =================================
 
+    // 업로더 로드
+    const url = new URL(EXEC_URL);
+    const sp = new URLSearchParams(url.search);
+    sp.set('redirect', encodeURIComponent(REDIRECT_URL));
+    url.search = sp.toString();
+    document.getElementById('uploader').src = url.toString();
+
+    // 주소창을 깔끔하게: 항상 /jh_ke_photo_upload/ 로 유지
+    const prettyPathA = "/jh_ke_photo_upload/";
+    const prettyPathB = "/jh_ke_photo_upload/index.html";
+    if (location.pathname !== prettyPathA && location.pathname !== prettyPathB || location.search) {
+      history.replaceState(null, "", prettyPathA);
+    }
+  </script>
+</body>
+</html>
