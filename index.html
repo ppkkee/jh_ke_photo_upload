@@ -5,63 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>사진 업로드</title>
   <style>
-    :root { --banner-h: 56px; } /* default */
-    @media (min-width:0) {
-      /* 한국어/일본어 등에서 배너가 더 클 수 있어 기본값을 조금 키움 */
-      :root[lang^="ko"], :root[lang^="ja"] { --banner-h: 64px; }
+    :root { --banner-h: 72px; } /* 더 넉넉한 기본값 (ko 환경 권장) */
+
+    html, body { height:100%; margin:0; background:#fafafa; }
+    /* 전체를 iframe으로 덮는 고정 레이아웃 (vh 사용 안 함) */
+    iframe#uploader {
+      position: fixed;
+      top: calc(-1 * var(--banner-h)); /* 배너만큼 위로 올림 */
+      left: 0; right: 0; bottom: 0;
+      width: 100%;
+      height: auto; /* bottom:0로 자동 계산 */
+      border: 0;
+      background: #fafafa;
     }
 
-    html, body { height: 100%; margin:0; background:#fafafa; }
-    .frame-wrap { position:fixed; inset:0; overflow:hidden; background:#fafafa; }
+    /* 래핑 박스는 숨김 마스크 역할만 */
+    .frame-wrap { position:fixed; inset:0; overflow:hidden; }
 
-    /* use dynamic viewport units for mobile address-bar shrink/expand */
-    iframe {
-      position:absolute; inset:0;
-      width:100%;
-      height: calc(100dvh + var(--banner-h)); /* fallback to 100vh in older browsers */
-      height: calc(100vh + var(--banner-h));
-      border:0;
-      transform: translateY(calc(-1 * var(--banner-h)));
-      background:#fafafa;
-    }
-
-    /* helper UI (hidden) */
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    /* 권한 관련 워닝 감소용: 필요 권한을 명시 */
   </style>
 </head>
 <body>
   <div class="frame-wrap">
     <iframe id="uploader"
-            allow="camera *; microphone *; clipboard-read *; clipboard-write *; geolocation *; fullscreen *; display-capture *; autoplay *; xr-spatial-tracking *">
-    </iframe>
+      allow="camera *; microphone *; clipboard-read *; clipboard-write *; geolocation *; fullscreen *; display-capture *; autoplay *; xr-spatial-tracking *"
+    ></iframe>
   </div>
 
-  <div class="sr-only" aria-live="polite" id="msg"></div>
-
   <script>
-    // === 설정: 아래 두 값만 바꾸세요 ===
-    const EXEC_URL = "PUT_YOUR_GAS_EXEC_URL_HERE"; // Apps Script /exec
+    // === 이 값만 바꾸세요 ===
+    const EXEC_URL = "https://script.google.com/macros/s/AKfycbx-e4VS-5QQCFR4swXi7nvOjKPxVV5mZIzf7JE6ZsnZsmstN2IGH_RwDD7cW3CeVytj/exec"; // Apps Script /exec
     const REDIRECT_URL = "https://toourguest.com/cards/jh-ke#guest-snap";
-    // ===================================
+    // ========================
 
-    // banner height override via query (?bh=72) if needed
+    // ▶ 옵션: ?bh=숫자 로 배너 높이 즉석 조정, ?showBanner=1 로 배너 숨김 해제
     const q = new URLSearchParams(location.search);
     const bh = q.get('bh');
+    const showBanner = q.get('showBanner') === '1';
     if (bh) document.documentElement.style.setProperty('--banner-h', parseInt(bh,10)+'px');
+    if (showBanner) document.documentElement.style.setProperty('--banner-h', '0px');
 
-    // load uploader with redirect param
+    // 업로더 URL 구성(redirect 전달)
     const url = new URL(EXEC_URL);
     const sp = new URLSearchParams(url.search);
     sp.set('redirect', encodeURIComponent(REDIRECT_URL));
     url.search = sp.toString();
     document.getElementById('uploader').src = url.toString();
 
-    // keep pretty URL (without queries)
+    // 주소창 깔끔하게 유지
     const prettyA = "/jh_ke_photo_upload/";
     const prettyB = "/jh_ke_photo_upload/index.html";
     if ((location.pathname !== prettyA && location.pathname !== prettyB) || location.search) {
       history.replaceState(null, "", prettyA);
     }
+
+    // 화면 회전/리사이즈시 강제 리렌더(일부 모바일에서 레이아웃 캐시 방지)
+    addEventListener('orientationchange', () => setTimeout(() => {
+      document.getElementById('uploader').style.transform = 'translateZ(0)';
+    }, 200));
   </script>
 </body>
 </html>
